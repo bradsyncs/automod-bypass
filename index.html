@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Discord AutoMod Bypass Generator</title>
+  <title>Brads Automod Bypass</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -21,217 +21,108 @@
       border-radius: 12px;
       padding: 32px;
       width: 100%;
-      max-width: 520px;
+      max-width: 480px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     }
     h1 {
-      font-size: 1.5rem;
-      margin-bottom: 8px;
+      font-size: 1.6rem;
+      margin-bottom: 28px;
       color: #fff;
-    }
-    p.subtitle {
-      color: #aaa;
-      font-size: 0.9rem;
-      margin-bottom: 24px;
-    }
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 0.9rem;
-      color: #ccc;
+      text-align: center;
     }
     input[type="text"] {
       width: 100%;
-      padding: 12px 14px;
+      padding: 14px 16px;
       border: 1px solid #40444b;
       border-radius: 8px;
       background: #1e1f22;
       color: #fff;
-      font-size: 1rem;
+      font-size: 1.05rem;
       margin-bottom: 16px;
     }
     input[type="text"]:focus {
       outline: none;
       border-color: #5865f2;
     }
-    .methods {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-    .method-btn {
-      padding: 8px 14px;
-      border: 1px solid #40444b;
-      border-radius: 20px;
-      background: #1e1f22;
-      color: #ccc;
-      cursor: pointer;
-      font-size: 0.85rem;
-      transition: all 0.15s;
-    }
-    .method-btn:hover { border-color: #5865f2; }
-    .method-btn.active {
-      background: #5865f2;
-      border-color: #5865f2;
-      color: white;
-    }
-    button.generate {
+    button.send {
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       background: #5865f2;
       color: white;
       border: none;
       border-radius: 8px;
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-weight: 600;
       cursor: pointer;
       margin-bottom: 20px;
     }
-    button.generate:hover { background: #4752c4; }
+    button.send:hover {
+      background: #4752c4;
+    }
     .output-box {
       background: #1e1f22;
       border: 1px solid #40444b;
       border-radius: 8px;
-      padding: 14px;
-      min-height: 52px;
+      padding: 16px;
+      min-height: 56px;
       word-break: break-all;
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       margin-bottom: 12px;
-      position: relative;
     }
-    .copy-btn {
+    button.copy {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       background: #3ba55d;
       color: white;
       border: none;
       border-radius: 8px;
-      font-size: 0.95rem;
+      font-size: 1rem;
       cursor: pointer;
     }
-    .copy-btn:hover { background: #2d7d46; }
-    .copy-btn.copied { background: #2d7d46; }
-    footer {
-      margin-top: 24px;
-      text-align: center;
-      font-size: 0.8rem;
-      color: #666;
+    button.copy:hover {
+      background: #2d7d46;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Discord AutoMod Bypass</h1>
-    <p class="subtitle">Turn any word into a filter-evasion version</p>
+    <h1>Brads Automod Bypass</h1>
 
-    <label for="word">Word to bypass</label>
     <input type="text" id="word" placeholder="Type a word..." autocomplete="off">
 
-    <label>Method</label>
-    <div class="methods">
-      <button class="method-btn active" data-method="homoglyph">Homoglyphs</button>
-      <button class="method-btn" data-method="zerowidth">Zero-width</button>
-      <button class="method-btn" data-method="mixed">Mixed</button>
-      <button class="method-btn" data-method="softhyphen">Soft Hyphen</button>
-    </div>
+    <button class="send" onclick="generate()">Send</button>
 
-    <button class="generate" onclick="generate()">Generate Bypass</button>
-
-    <div class="output-box" id="output">Your result will appear here</div>
-    <button class="copy-btn" onclick="copyResult()">Copy to Clipboard</button>
-
-    <footer>Works best with Homoglyphs • Client-side only</footer>
+    <div class="output-box" id="output"></div>
+    <button class="copy" onclick="copyResult()">Copy</button>
   </div>
 
   <script>
-    // Homoglyph map (Latin → lookalike)
     const homoglyphs = {
-      'a': 'а', // Cyrillic
-      'e': 'е',
-      'o': 'о',
-      'c': 'с',
-      'i': 'і',
-      'p': 'р',
-      'y': 'у',
-      'x': 'х',
-      's': 'ѕ',
-      'h': 'һ',
-      'j': 'ј',
-      'A': 'А',
-      'E': 'Е',
-      'O': 'О',
-      'C': 'С',
-      'I': 'І',
-      'P': 'Р',
-      'Y': 'Υ',
-      'X': 'Х',
-      'S': 'Ѕ',
-      'H': 'Н',
-      'B': 'В',
-      'M': 'М',
-      'T': 'Т',
-      'K': 'К'
+      'a': 'а', 'e': 'е', 'o': 'о', 'c': 'с', 'i': 'і',
+      'p': 'р', 'y': 'у', 'x': 'х', 's': 'ѕ', 'h': 'һ',
+      'j': 'ј', 'A': 'А', 'E': 'Е', 'O': 'О', 'C': 'С',
+      'I': 'І', 'P': 'Р', 'Y': 'Υ', 'X': 'Х', 'S': 'Ѕ',
+      'H': 'Н', 'B': 'В', 'M': 'М', 'T': 'Т', 'K': 'К'
     };
 
-    const zeroWidth = '\u200B'; // Zero Width Space
-    const softHyphen = '\u00AD';
-
-    let currentMethod = 'homoglyph';
     let lastResult = '';
-
-    // Method button switching
-    document.querySelectorAll('.method-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentMethod = btn.dataset.method;
-      });
-    });
 
     function generate() {
       const word = document.getElementById('word').value.trim();
       if (!word) {
-        document.getElementById('output').textContent = 'Please type a word first';
+        document.getElementById('output').textContent = '';
         return;
       }
 
-      let result = '';
-
-      if (currentMethod === 'homoglyph') {
-        result = word.split('').map(char => homoglyphs[char] || char).join('');
-      } 
-      else if (currentMethod === 'zerowidth') {
-        result = word.split('').join(zeroWidth);
-      } 
-      else if (currentMethod === 'mixed') {
-        result = word.split('').map((char, i) => {
-          const mapped = homoglyphs[char] || char;
-          return i < word.length - 1 ? mapped + zeroWidth : mapped;
-        }).join('');
-      } 
-      else if (currentMethod === 'softhyphen') {
-        result = word.split('').join(softHyphen);
-      }
-
-      lastResult = result;
-      document.getElementById('output').textContent = result;
+      lastResult = word.split('').map(char => homoglyphs[char] || char).join('');
+      document.getElementById('output').textContent = lastResult;
     }
 
     function copyResult() {
       if (!lastResult) return;
-      navigator.clipboard.writeText(lastResult).then(() => {
-        const btn = document.querySelector('.copy-btn');
-        btn.textContent = 'Copied!';
-        btn.classList.add('copied');
-        setTimeout(() => {
-          btn.textContent = 'Copy to Clipboard';
-          btn.classList.remove('copied');
-        }, 1500);
-      });
+      navigator.clipboard.writeText(lastResult);
     }
 
-    // Generate on Enter key
     document.getElementById('word').addEventListener('keypress', e => {
       if (e.key === 'Enter') generate();
     });
